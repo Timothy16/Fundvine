@@ -125,7 +125,7 @@
   
             <!-- Submit Button -->
             <div>
-                <NuxtLink to="/verify-account" class="mt-4">
+                <NuxtLink to="/biodata" class="mt-4">
                     <button
                         type="submit"
                         class="w-full bg-[#1a3c6d] text-white px-6 py-3 rounded-md hover:bg-[#1a3c6d]-600 focus:ring-2 focus:ring-[#1a3c6d]-400"

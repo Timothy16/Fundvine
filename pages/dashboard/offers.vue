@@ -21,13 +21,13 @@
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                 <div class="flex justify-between items-start mb-6">
                     <div class="flex items-center">
-                    <img src="/images/flag.svg" alt="UBA" class="h-8 mr-3" />
-                    <div>
-                        <h4 class="font-medium">Fundvine Money Market Fund</h4>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Rights Issue
-                        </span>
-                    </div>
+                        <img src="/images/flag.svg" alt="UBA" class="h-8 mr-3" />
+                        <div>
+                            <h4 class="font-medium">Fundvine Money Market Fund</h4>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Rights Issue
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-6">
