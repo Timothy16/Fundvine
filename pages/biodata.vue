@@ -1,3 +1,4 @@
+// biodata.vue
 <template>
     <div class="flex min-h-screen">
          <!-- Mobile Back Button -->

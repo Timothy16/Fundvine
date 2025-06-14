@@ -100,6 +100,33 @@
 
         <div class="bg-white px-6 py-4">
           <div class="max-w-2xl">
+            <!-- Success/Error Messages -->
+            <div v-if="success" class="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-green-800">{{ success }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="error" class="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                  </svg>
+                </div>
+                <div class="ml-3">
+                  <p class="text-sm text-red-800">{{ error }}</p>
+                </div>
+              </div>
+            </div>
+
             <form @submit.prevent="handlePasswordChange">
               <div class="space-y-6">
                 <div>
@@ -108,7 +135,10 @@
                     <input 
                       :type="showCurrentPassword ? 'text' : 'password'"
                       v-model="currentPassword"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      :class="[
+                        'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500',
+                        fieldErrors.currentPassword ? 'border-red-500' : 'border-gray-300'
+                      ]"
                       placeholder="Current Password"
                     />
                     <button 
@@ -121,6 +151,7 @@
                       </span>
                     </button>
                   </div>
+                  <p v-if="fieldErrors.currentPassword" class="mt-1 text-sm text-red-600">{{ fieldErrors.currentPassword }}</p>
                 </div>
 
                 <div>
@@ -129,7 +160,10 @@
                     <input 
                       :type="showNewPassword ? 'text' : 'password'"
                       v-model="newPassword"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      :class="[
+                        'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500',
+                        fieldErrors.newPassword ? 'border-red-500' : 'border-gray-300'
+                      ]"
                       placeholder="New Password"
                     />
                     <button 
@@ -142,6 +176,7 @@
                       </span>
                     </button>
                   </div>
+                  <p v-if="fieldErrors.newPassword" class="mt-1 text-sm text-red-600">{{ fieldErrors.newPassword }}</p>
                 </div>
 
                 <div>
@@ -150,7 +185,10 @@
                     <input 
                       :type="showConfirmPassword ? 'text' : 'password'"
                       v-model="confirmPassword"
-                      class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                      :class="[
+                        'w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500',
+                        fieldErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                      ]"
                       placeholder="Confirm Password"
                     />
                     <button 
@@ -163,6 +201,7 @@
                       </span>
                     </button>
                   </div>
+                  <p v-if="fieldErrors.confirmPassword" class="mt-1 text-sm text-red-600">{{ fieldErrors.confirmPassword }}</p>
                 </div>
 
                 <!-- Password Policy -->
@@ -179,9 +218,19 @@
 
                 <button 
                   type="submit"
-                  class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  :disabled="isLoading"
+                  :class="[
+                    'w-full py-2 rounded-lg transition-colors flex justify-center items-center',
+                    isLoading 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                  ]"
                 >
-                  Change Password
+                  <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {{ isLoading ? 'Changing Password...' : 'Change Password' }}
                 </button>
               </div>
             </form>
@@ -191,8 +240,14 @@
     </div>
   </NuxtLayout>
 </template>
-
 <script setup>
+definePageMeta({
+  middleware: ['auth']
+})
+
+const { apiRequest } = useApiService()
+const config = useRuntimeConfig()
+
 const activeTab = ref('profile')
 const currentPassword = ref('')
 const newPassword = ref('')
@@ -201,8 +256,118 @@ const showCurrentPassword = ref(false)
 const showNewPassword = ref(false)
 const showConfirmPassword = ref(false)
 
-const handlePasswordChange = () => {
-  // Handle password change logic here
-  console.log('Password change submitted')
+// UI state
+const isLoading = ref(false)
+const error = ref('')
+const success = ref('')
+const fieldErrors = ref({})
+let successTimeout = null
+let errorTimeout = null
+
+
+const handlePasswordChange = async () => {
+  // Reset states
+  isLoading.value = true
+  error.value = ''
+  success.value = ''
+  fieldErrors.value = {}
+
+  // Client-side validation
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    error.value = 'All fields are required'
+    isLoading.value = false
+    return
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    error.value = 'New password and confirm password do not match'
+    isLoading.value = false
+    return
+  }
+
+  try {
+    const payload = {
+      old_password: currentPassword.value,
+      password: newPassword.value,
+      confirm_password: confirmPassword.value
+    }
+
+    await apiRequest(
+      `${config.public.apiBaseUrl}/api/client/v2/auth/change-password`,
+      {
+        method: 'POST',
+        body: payload
+      }
+    )
+
+    // Success
+    success.value = 'Password changed successfully!'
+    
+    // Clear form
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+
+  } catch (err) {
+    console.error('Password change error:', err)
+    
+    // Handle validation errors (422)
+    if (err.status === 422 && err.data?.errors) {
+      const errors = {}
+      err.data.errors.forEach(error => {
+        // Map API field names to form field names
+        if (error.field === 'old_password') {
+          errors.currentPassword = error.message
+        } else if (error.field === 'password') {
+          errors.newPassword = error.message
+        } else if (error.field === 'confirm_password') {
+          errors.confirmPassword = error.message
+        }
+      })
+      fieldErrors.value = errors
+    } else {
+      // Handle other errors
+      error.value = err.message || 'Failed to change password. Please try again.'
+    }
+  } finally {
+    isLoading.value = false
+  }
 }
+
+// Clear errors when user types (but keep success message)
+watch([currentPassword, newPassword, confirmPassword], () => {
+  error.value = ''
+  fieldErrors.value = {}
+  // Clear any existing timeouts
+  if (errorTimeout) {
+    clearTimeout(errorTimeout)
+    errorTimeout = null
+  }
+})
+
+// Auto-hide success message after 5 seconds
+watch(success, (newValue) => {
+  if (newValue && successTimeout) {
+    clearTimeout(successTimeout)
+  }
+  if (newValue) {
+    successTimeout = setTimeout(() => {
+      success.value = ''
+      successTimeout = null
+    }, 5000)
+  }
+})
+
+// Auto-hide error message after 5 seconds
+watch(error, (newValue) => {
+  if (newValue && errorTimeout) {
+    clearTimeout(errorTimeout)
+  }
+  if (newValue) {
+    errorTimeout = setTimeout(() => {
+      error.value = ''
+      errorTimeout = null
+    }, 5000)
+  }
+})
 </script>

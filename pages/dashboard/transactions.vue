@@ -98,6 +98,9 @@
 </template>
 
 <script setup>
+definePageMeta({
+  middleware: ['auth']
+})
 const transactions = ref([
   {
     date: '2024-12-06',

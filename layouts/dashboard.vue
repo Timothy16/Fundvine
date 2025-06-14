@@ -43,12 +43,12 @@
         </div>
       </nav>
       <div class="absolute bottom-0 w-96 p-4">
-        <NuxtLink to="/login">
-            <button class="flex items-center p-3 w-full hover:bg-[#ffa500] rounded-lg transition-colors">
-            <span class="material-icons mr-3">logout</span>
-            Logout
+        
+            <button @click="handleLogout" class="flex items-center p-3 w-full hover:bg-[#ffa500] rounded-lg transition-colors">
+              <span class="material-icons mr-3">logout</span>
+              Logout
             </button>
-        </NuxtLink>
+       
       </div>
     </aside>
 
@@ -62,13 +62,13 @@
         <div class="flex items-center">
           <p class="mr-3">{{ currentPageTitle }}</p>
           <div class="h-8 w-8 rounded-full bg-green-700 text-white flex items-center justify-center">
-            BF
+            {{ userInitials }}
           </div>
         </div>
       </header>
 
       <!-- Desktop Header -->
-      <header class="bg-white hidden md:block border-b">
+     <header class="bg-white hidden md:block border-b">
         <div class="flex justify-between items-center p-6">
           <div>
             <h1 class="text-2xl font-semibold">{{ currentPageTitle }}</h1>
@@ -76,11 +76,11 @@
           </div>
           <div class="flex items-center">
             <div class="mr-4 text-right">
-              <p class="font-medium">Bekee Franklin</p>
-              <p class="text-sm text-gray-600">frankidup@yahoo.com</p>
+              <p class="font-medium">{{ user?.full_name || 'User' }}</p>
+              <p class="text-sm text-gray-600">{{ user?.email || 'No email' }}</p>
             </div>
             <div class="h-10 w-10 rounded-full bg-green-700 text-white flex items-center justify-center">
-              BF
+              {{ userInitials }}
             </div>
           </div>
         </div>
@@ -93,76 +93,94 @@
     </div>
 
     <!-- Mobile Sidebar -->
-<transition
-  enter-active-class="transition-transform duration-300 ease-out"
-  enter-from-class="-translate-x-full"
-  enter-to-class="translate-x-0"
-  leave-active-class="transition-transform duration-300 ease-in"
-  leave-from-class="translate-x-0"
-  leave-to-class="-translate-x-full"
->
-  <div v-if="isSidebarOpen" class="fixed inset-0 z-50">
-    <!-- Backdrop -->
-    <div class="absolute inset-0 bg-black bg-opacity-50" @click="isSidebarOpen = false"></div>
-    
-    <!-- Sidebar -->
-    <div class="relative w-[280px] h-full sidebar-gradient text-white">
-      <div class="flex justify-between items-center p-4 border-b border-gray-700">
-        <img src="/images/logo.png" alt="NGX Logo" class="h-8" />
-        <button @click="isSidebarOpen = false" class="text-white">
-          <span class="material-icons">close</span>
-        </button>
-      </div>
-      <nav class="mt-4">
-        <div class="px-4 space-y-2">
-          <NuxtLink 
-            to="/dashboard/offers" 
-            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/offers' }"
-            @click="isSidebarOpen = false"
-          >
-            <span class="material-icons mr-3">local_offer</span>
-            Offers
-          </NuxtLink>
-          <NuxtLink 
-            to="/dashboard/transactions" 
-            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/transactions' }"
-            @click="isSidebarOpen = false"
-          >
-            <span class="material-icons mr-3">history</span>
-            Transaction History
-          </NuxtLink>
-          <NuxtLink 
-            to="/dashboard/kyc" 
-            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/kyc' }"
-            @click="isSidebarOpen = false"
-          >
-            <span class="material-icons mr-3">verified_user</span>
-            KYC
-          </NuxtLink>
-          <NuxtLink 
-            to="/dashboard/settings" 
-            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/settings' }"
-            @click="isSidebarOpen = false"
-          >
-            <span class="material-icons mr-3">settings</span>
-            Settings
-          </NuxtLink>
+    <transition
+      enter-active-class="transition-transform duration-300 ease-out"
+      enter-from-class="-translate-x-full"
+      enter-to-class="translate-x-0"
+      leave-active-class="transition-transform duration-300 ease-in"
+      leave-from-class="translate-x-0"
+      leave-to-class="-translate-x-full"
+    >
+      <div v-if="isSidebarOpen" class="fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black bg-opacity-50" @click="isSidebarOpen = false"></div>
+        
+        <!-- Sidebar -->
+        <div class="relative w-[280px] h-full sidebar-gradient text-white">
+          <div class="flex justify-between items-center p-4 border-b border-gray-700">
+            <img src="/images/logo.png" alt="NGX Logo" class="h-8" />
+            <button @click="isSidebarOpen = false" class="text-white">
+              <span class="material-icons">close</span>
+            </button>
+          </div>
+          <nav class="mt-4">
+            <div class="px-4 space-y-2">
+              <NuxtLink 
+                to="/dashboard/offers" 
+                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/offers' }"
+                @click="isSidebarOpen = false"
+              >
+                <span class="material-icons mr-3">local_offer</span>
+                Offers
+              </NuxtLink>
+              <NuxtLink 
+                to="/dashboard/transactions" 
+                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/transactions' }"
+                @click="isSidebarOpen = false"
+              >
+                <span class="material-icons mr-3">history</span>
+                Transaction History
+              </NuxtLink>
+              <NuxtLink 
+                to="/dashboard/kyc" 
+                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/kyc' }"
+                @click="isSidebarOpen = false"
+              >
+                <span class="material-icons mr-3">verified_user</span>
+                KYC
+              </NuxtLink>
+              <NuxtLink 
+                to="/dashboard/settings" 
+                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/settings' }"
+                @click="isSidebarOpen = false"
+              >
+                <span class="material-icons mr-3">settings</span>
+                Settings
+              </NuxtLink>
+            </div>
+          </nav>
         </div>
-      </nav>
-    </div>
-  </div>
-</transition>
+      </div>
+    </transition>
   </div>
 </template>
 
-
 <script setup>
-const isSidebarOpen = ref(false)
+const router = useRouter()
 const route = useRoute()
+const { signOut, data: authData } = useAuth()
+
+// Get authenticated user data - make it reactive to auth changes
+const user = computed(() => {
+  return authData.value?.user || null
+})
+
+const isSidebarOpen = ref(false)
+
+// Generate initials from full name - now reactive to user changes
+const userInitials = computed(() => {
+  if (!user.value?.full_name) return 'U'
+  
+  return user.value.full_name
+    .split(' ')
+    .map(name => name.charAt(0).toUpperCase())
+    .slice(0, 2) // Take first 2 initials
+    .join('')
+})
 
 // Reactive page title and description based on current route
 const currentPageTitle = computed(() => {
@@ -194,7 +212,18 @@ const currentPageDescription = computed(() => {
       return 'Welcome to your dashboard'
   }
 })
+
+const handleLogout = async () => {
+  try {
+    await signOut({ redirect: false })
+    router.push('/login')
+  } catch (error) {
+    console.error('Logout error:', error)
+    router.push('/login')
+  }
+}
 </script>
+
 <style scoped>
 .sidebar-gradient {
   background-image: linear-gradient(90deg, #1a3c6d, #102442);
