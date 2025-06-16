@@ -1,10 +1,11 @@
+// middleware/auth.ts
 export default defineNuxtRouteMiddleware(async (to) => {
-  const { status, data: authData } = useAuth()
+  const { status, data: authData, getSession } = useAuth()
   
   // If the user is not authenticated
   if (status.value === 'unauthenticated') {
     // Allow access to public pages
-    if (to.path === '/login' || to.path === '/register' || to.path === '/') {
+    if (to.path === '/login' || to.path === '/register' || to.path === '/' || to.path === '/forgot-password') {
       return
     }
     
@@ -14,7 +15,24 @@ export default defineNuxtRouteMiddleware(async (to) => {
   
   // If user is authenticated, get their data
   if (status.value === 'authenticated') {
-    const user = authData.value?.user
+    let user = authData.value?.user
+    
+    // For protected routes, ensure we have the latest session data
+    const protectedRoutes = ['/dashboard', '/kyc', '/settings', '/transactions']
+    const isProtectedRoute = protectedRoutes.some(route => to.path.startsWith(route))
+    
+    // Force refresh session for protected routes to get latest user data
+    if (isProtectedRoute) {
+      try {
+        console.log('Middleware: Refreshing session for protected route...')
+        const freshSession = await getSession({ force: true })
+        user = freshSession?.user || user
+        console.log('Middleware: Fresh user data:', { email_verified: user?.email_verified })
+      } catch (error) {
+        console.error('Middleware: Failed to refresh session:', error)
+        // Continue with existing user data as fallback
+      }
+    }
     
     // If we're on login page and user is authenticated, redirect based on email verification
     if (to.path === '/login') {
@@ -32,6 +50,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     
     // If trying to access dashboard pages but email is not verified
     if (to.path.startsWith('/dashboard') && !user?.email_verified) {
+      console.log('Middleware: Redirecting to verify-account, email_verified:', user?.email_verified)
       return navigateTo('/verify-account')
     }
 

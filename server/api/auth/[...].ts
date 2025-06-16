@@ -104,20 +104,26 @@ export default NuxtAuthHandler({
   ],
   session: {
     strategy: "jwt",
+    maxAge: 24 * 60 * 60, // 24 hours
   },
   callbacks: {
-    // Save user data and token in the JWT
+    // Store the access token in the JWT
     async jwt({ token, user }) {
       if (user) {
+        // On signin, store the access token
+        token.accessToken = user.accessToken
         token.user = user
       }
       return token
     },
-    // Make the user data and token available in the session
+    
+    // Always fetch fresh user data in session callback
     async session({ session, token }) {
-      if (token.user) {
-        // Always fetch fresh user data when creating session
+      if (token.accessToken) {
+        console.log('Session callback - Always fetching fresh user data...')
+        
         try {
+          // Always fetch fresh profile data from API
           const profileResponse = await $fetch<{
             status_code: number;
             message: string;
@@ -134,32 +140,43 @@ export default NuxtAuthHandler({
               method: "GET",
               headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${token.user.accessToken}`,
+                "Authorization": `Bearer ${token.accessToken}`,
               },
             }
           )
           
+          console.log('Fresh profile API response:', {
+            status: profileResponse?.status_code,
+            email_verified: profileResponse?.data?.email_verified
+          })
+          
           if (profileResponse && profileResponse.status_code === 200) {
-            // Use fresh profile data
+            // Always use fresh data from API
             session.user = {
-              ...token.user,
               full_name: profileResponse.data.full_name,
               last_name: profileResponse.data.last_name,
               is_corporate: profileResponse.data.is_corporate,
               email_verified: profileResponse.data.email_verified,
               account_approved: profileResponse.data.account_approved,
+              accessToken: token.accessToken,
               profile: profileResponse.data
             }
+            
+            console.log('Session updated with fresh user data:', { 
+              email_verified: session.user.email_verified 
+            })
           } else {
+            console.error('Failed to fetch fresh profile data')
             // Fallback to token data if API fails
             session.user = token.user
           }
         } catch (error) {
           console.error("Error fetching fresh user profile:", error)
           // Fallback to token data if API fails
-          session.user = token.user
+          session.user = token.user || {}
         }
       }
+      
       return session
     }
   },

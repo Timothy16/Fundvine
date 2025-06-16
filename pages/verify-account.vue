@@ -143,8 +143,7 @@ definePageMeta({
   middleware: ['auth'] // User must be logged in to access this page
 })
 
-const { apiRequest } = useApiService()
-const config = useRuntimeConfig()
+const { getSession } = useAuth()
 const router = useRouter()
 
 // Form state
@@ -196,75 +195,6 @@ watch(resendSuccess, (newValue) => {
   }
 })
 
-
-const handleVerificationOld = async () => {
-  if (verificationCode.value.length !== 6) {
-    error.value = 'Please enter a valid 6-digit code'
-    return
-  }
-
-  isLoading.value = true
-  error.value = ''
-
-  try {
-    const payload = {
-      code: verificationCode.value
-    }
-
-    await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/auth/verify-email`,
-      {
-        method: 'POST',
-        body: payload
-      }
-    )
-
-    // Verification successful
-    isVerified.value = true
-
-  } catch (err) {
-    console.error('Verification error:', err)
-    
-    // Handle different error types
-    if (err.status === 422) {
-      error.value = 'Invalid verification code. Please check and try again.'
-    } else if (err.status === 400) {
-      error.value = 'Verification code has expired. Please request a new one.'
-    } else {
-      error.value = err.message || 'Verification failed. Please try again.'
-    }
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const handleResendEmailOld = async () => {
-  isResending.value = true
-  error.value = ''
-  resendSuccess.value = ''
-
-  try {
-    await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/auth/resend-email-verification`,
-      {
-        method: 'POST'
-      }
-    )
-
-    // Resend successful
-    resendSuccess.value = 'Verification email sent successfully! Please check your inbox.'
-    
-    // Clear the current verification code
-    verificationCode.value = ''
-
-  } catch (err) {
-    console.error('Resend error:', err)
-    error.value = err.message || 'Failed to resend email. Please try again.'
-  } finally {
-    isResending.value = false
-  }
-}
-
 const handleVerification = async () => {
   if (verificationCode.value.length !== 6) {
     error.value = 'Please enter a valid 6-digit code'
@@ -285,8 +215,16 @@ const handleVerification = async () => {
       body: payload
     })
 
-    // Verification successful - just set the verified state
-    // We'll handle navigation separately since NextAuth session update is complex
+    // Verification successful - update the session to reflect the new email_verified status
+    console.log('Email verification successful, updating session...')
+    
+    // Force refresh the session to get updated user data
+    await getSession({ force: true })
+    
+    // Wait a moment for the session to be updated
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Set verification state
     isVerified.value = true
 
   } catch (err) {
@@ -306,8 +244,8 @@ const handleVerification = async () => {
 }
 
 const goToDashboard = async () => {
-  // Navigate using router after verification
-  await router.push('/dashboard/offers')
+  // Navigate to dashboard - the middleware will handle the session checks
+  await router.push('/dashboard/kyc')
 }
 
 const handleResendEmail = async () => {

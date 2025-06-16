@@ -4,7 +4,8 @@ import { type User } from "./useAuthToken"
 export const useAuthUser = () => {
   const { data } = useAuth()
   
-  const user = data.value?.user ? data.value?.user as User : null
-  
-  return useState('user', () => user)
+  // Return computed user that updates when session changes
+  return computed(() => {
+    return data.value?.user as User || null
+  })
 }
