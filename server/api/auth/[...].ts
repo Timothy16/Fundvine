@@ -115,10 +115,52 @@ export default NuxtAuthHandler({
     },
     // Make the user data and token available in the session
     async session({ session, token }) {
-        if (token.user) {
-          session.user = token.user;
+      if (token.user) {
+        // Always fetch fresh user data when creating session
+        try {
+          const profileResponse = await $fetch<{
+            status_code: number;
+            message: string;
+            data: {
+              full_name: string;
+              last_name: string;
+              is_corporate: boolean;
+              email_verified: boolean;
+              account_approved: boolean;
+            }
+          }>(
+            config.apiBaseUrl + '/api/client/v2/profile/my-account',
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token.user.accessToken}`,
+              },
+            }
+          )
+          
+          if (profileResponse && profileResponse.status_code === 200) {
+            // Use fresh profile data
+            session.user = {
+              ...token.user,
+              full_name: profileResponse.data.full_name,
+              last_name: profileResponse.data.last_name,
+              is_corporate: profileResponse.data.is_corporate,
+              email_verified: profileResponse.data.email_verified,
+              account_approved: profileResponse.data.account_approved,
+              profile: profileResponse.data
+            }
+          } else {
+            // Fallback to token data if API fails
+            session.user = token.user
+          }
+        } catch (error) {
+          console.error("Error fetching fresh user profile:", error)
+          // Fallback to token data if API fails
+          session.user = token.user
         }
-        return session;
       }
+      return session
+    }
   },
 })

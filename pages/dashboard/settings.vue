@@ -38,7 +38,7 @@
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="space-y-1">
               <label class="text-sm text-gray-500">FIRST NAME</label>
-              <p class="text-gray-900">Bekee</p>
+              <p class="text-gray-900">-</p>
             </div>
 
             <div class="space-y-1">
@@ -48,42 +48,42 @@
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">LAST NAME</label>
-              <p class="text-gray-900">Franklin</p>
+              <p class="text-gray-900">-</p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">EMAIL ADDRESS</label>
-              <p class="text-gray-900">frank4up@yahoo.com</p>
+              <p class="text-gray-900">-</p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">PHONE NUMBER</label>
               <p class="text-gray-900 flex items-center">
                 <img src="/images/flag.svg" alt="NG" class="h-4 w-6 mr-2" />
-                2348067937292
+                -
               </p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">BVN</label>
-              <p class="text-gray-900">2224*******</p>
+              <p class="text-gray-900">*******</p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">ADDRESS</label>
-              <p class="text-gray-900">273b Ajose Adeogun Street</p>
+              <p class="text-gray-900">-</p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">NEXT OF KIN NAME</label>
-              <p class="text-gray-900">Bekee Jayden Chimebuka</p>
+              <p class="text-gray-900">-</p>
             </div>
 
             <div class="space-y-1">
               <label class="text-sm text-gray-500">NEXT OF KIN PHONE NUMBER</label>
               <p class="text-gray-900 flex items-center">
                 <img src="/images/flag.svg" alt="NG" class="h-4 w-6 mr-2" />
-                8067937292
+                -
               </p>
             </div>
           </div>

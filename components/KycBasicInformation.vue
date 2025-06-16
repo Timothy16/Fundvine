@@ -342,9 +342,6 @@
   </div>
 </template>
 <script setup>
-const { apiRequest } = useApiService()
-const config = useRuntimeConfig()
-
 // Form data
 const formData = ref({
   nin: '',
@@ -429,12 +426,11 @@ onMounted(async () => {
 // Load countries
 const loadCountries = async () => {
   try {
-    const response = await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/location/get-countries`
-    )
+    const response = await $fetch('/api/countries')
     countries.value = response.data || []
   } catch (err) {
     console.error('Error loading countries:', err)
+    error.value = 'Failed to load countries. Please refresh the page.'
   }
 }
 
@@ -450,9 +446,7 @@ const onCountryChange = async () => {
 
   isLoadingStates.value = true
   try {
-    const response = await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/location/get-states?countryId=${formData.value.country_of_origin_id}`
-    )
+    const response = await $fetch(`/api/states?countryId=${formData.value.country_of_origin_id}`)
     states.value = response.data || []
   } catch (err) {
     console.error('Error loading states:', err)
@@ -472,9 +466,7 @@ const onStateChange = async () => {
 
   isLoadingLgas.value = true
   try {
-    const response = await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/location/get-lgas?stateId=${formData.value.state_of_origin_id}`
-    )
+    const response = await $fetch(`/api/lgas?stateId=${formData.value.state_of_origin_id}`)
     lgas.value = response.data || []
   } catch (err) {
     console.error('Error loading LGAs:', err)
@@ -515,33 +507,28 @@ const handleSubmit = async () => {
       maiden_name: formData.value.maiden_name
     }
 
-    await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/profile/kyc-data`,
-      {
-        method: 'PATCH',
-        body: payload
-      }
-    )
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/kyc-data', {
+      method: 'PATCH',
+      body: payload
+    })
 
     // Success
     success.value = 'Your basic information has been saved successfully!'
-    
-    // Optionally reset form or keep data for user to see
-    // formData.value = { ... } // Reset if needed
 
   } catch (err) {
     console.error('KYC submission error:', err)
     
     // Handle validation errors (422)
-    if (err.status === 422 && err.data?.errors) {
+    if (err.statusCode === 422 && err.data?.data?.errors) {
       const errors = {}
-      err.data.errors.forEach(error => {
+      err.data.data.errors.forEach(error => {
         errors[error.field] = error.message
       })
       fieldErrors.value = errors
     } else {
       // Handle other errors
-      error.value = err.message || 'Failed to save information. Please try again.'
+      error.value = err.statusMessage || err.message || 'Failed to save information. Please try again.'
     }
   } finally {
     isLoading.value = false

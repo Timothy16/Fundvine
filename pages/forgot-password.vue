@@ -125,8 +125,6 @@
     </div>
 </template>
 <script setup>
-const { apiRequest } = useApiService()
-const config = useRuntimeConfig()
 const router = useRouter()
 
 // Form data
@@ -176,13 +174,11 @@ const handleForgotPassword = async () => {
       email: email.value
     }
 
-    await apiRequest(
-      `${config.public.apiBaseUrl}/api/client/v2/auth/forgot-password-request`,
-      {
-        method: 'POST',
-        body: payload
-      }
-    )
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/forgot-password', {
+      method: 'POST',
+      body: payload
+    })
 
     // Success - show modal
     showSuccessModal.value = true
@@ -191,12 +187,14 @@ const handleForgotPassword = async () => {
     console.error('Forgot password error:', err)
     
     // Handle different error types
-    if (err.status === 404) {
+    if (err.statusCode === 404) {
       error.value = 'No account found with this email address.'
-    } else if (err.status === 422) {
+    } else if (err.statusCode === 422) {
       error.value = 'Please enter a valid email address.'
+    } else if (err.statusCode === 429) {
+      error.value = 'Too many requests. Please try again later.'
     } else {
-      error.value = err.message || 'Failed to send reset email. Please try again.'
+      error.value = err.statusMessage || err.message || 'Failed to send reset email. Please try again.'
     }
   } finally {
     isLoading.value = false

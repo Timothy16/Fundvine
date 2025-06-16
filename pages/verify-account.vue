@@ -130,7 +130,7 @@
         Your account has been verified. You can now access your dashboard.
       </p>
       <button
-        @click="$router.push('/dashboard/offers')"
+        @click="goToDashboard"
         class="mt-6 w-full bg-orange-500 text-white py-3 px-6 rounded-md hover:bg-orange-600 focus:ring-2 focus:ring-orange-300"
       >
         Go to Dashboard →
@@ -196,7 +196,8 @@ watch(resendSuccess, (newValue) => {
   }
 })
 
-const handleVerification = async () => {
+
+const handleVerificationOld = async () => {
   if (verificationCode.value.length !== 6) {
     error.value = 'Please enter a valid 6-digit code'
     return
@@ -237,7 +238,7 @@ const handleVerification = async () => {
   }
 }
 
-const handleResendEmail = async () => {
+const handleResendEmailOld = async () => {
   isResending.value = true
   error.value = ''
   resendSuccess.value = ''
@@ -259,6 +260,76 @@ const handleResendEmail = async () => {
   } catch (err) {
     console.error('Resend error:', err)
     error.value = err.message || 'Failed to resend email. Please try again.'
+  } finally {
+    isResending.value = false
+  }
+}
+
+const handleVerification = async () => {
+  if (verificationCode.value.length !== 6) {
+    error.value = 'Please enter a valid 6-digit code'
+    return
+  }
+
+  isLoading.value = true
+  error.value = ''
+
+  try {
+    const payload = {
+      code: verificationCode.value
+    }
+
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/verify-email', {
+      method: 'POST',
+      body: payload
+    })
+
+    // Verification successful - just set the verified state
+    // We'll handle navigation separately since NextAuth session update is complex
+    isVerified.value = true
+
+  } catch (err) {
+    console.error('Verification error:', err)
+    
+    // Handle different error types
+    if (err.statusCode === 422) {
+      error.value = 'Invalid verification code. Please check and try again.'
+    } else if (err.statusCode === 400) {
+      error.value = 'Verification code has expired. Please request a new one.'
+    } else {
+      error.value = err.statusMessage || err.message || 'Verification failed. Please try again.'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+const goToDashboard = async () => {
+  // Navigate using router after verification
+  await router.push('/dashboard/offers')
+}
+
+const handleResendEmail = async () => {
+  isResending.value = true
+  error.value = ''
+  resendSuccess.value = ''
+
+  try {
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/resend-email-verification', {
+      method: 'POST'
+    })
+
+    // Resend successful
+    resendSuccess.value = 'Verification email sent successfully! Please check your inbox.'
+    
+    // Clear the current verification code
+    verificationCode.value = ''
+
+  } catch (err) {
+    console.error('Resend error:', err)
+    error.value = err.statusMessage || err.message || 'Failed to resend email. Please try again.'
   } finally {
     isResending.value = false
   }

@@ -289,6 +289,86 @@ const handleRegistration = async () => {
       user_password: formData.value.user_password
     }
 
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/register', {
+      method: 'POST',
+      body: registrationData
+    })
+
+    // Registration successful, show success modal
+    showSuccessModal.value = true
+    
+    // Wait 2 seconds to show congratulations message
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    // Switch to logging in state
+    isLoggingIn.value = true
+    
+    // Now auto-login
+    const loginResult = await signIn('credentials', {
+      email: formData.value.user_email,
+      password: formData.value.user_password,
+      redirect: false
+    })
+
+    if (loginResult?.error) {
+      // Registration succeeded but login failed
+      isLoggingIn.value = false
+      showSuccessModal.value = false
+      generalError.value = 'Account created successfully, but auto-login failed. Please login manually.'
+      // Redirect to login page after a delay
+      setTimeout(() => {
+        router.push('/login')
+      }, 3000)
+    } else {
+      // Both registration and login successful
+      // Force refresh the session to get updated user data
+      const { getSession } = useAuth()
+      await getSession({ force: true })
+      
+      // Wait a moment to show the sending email state and ensure session is updated
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      router.push('/verify-account')
+    }
+
+  } catch (error) {
+    console.error('Registration error:', error)
+    
+    // Handle validation errors (422)
+    if (error.statusCode === 422 && error.data?.data?.errors) {
+      const errors = {}
+      error.data.data.errors.forEach(err => {
+        errors[err.field] = err.message
+      })
+      fieldErrors.value = errors
+    } else {
+      // Handle other errors
+      generalError.value = error.statusMessage || error.message || 'Registration failed. Please try again.'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+const handleRegistrationOld = async () => {
+  if (!formData.value.agreeToTerms) {
+    generalError.value = 'Please accept the terms and conditions'
+    return
+  }
+
+  isLoading.value = true
+  generalError.value = ''
+  fieldErrors.value = {}
+
+  try {
+    // Prepare registration data
+    const registrationData = {
+      first_name: formData.value.first_name,
+      last_name: formData.value.last_name,
+      user_email: formData.value.user_email,
+      phone_number: fullPhoneNumber.value,
+      user_password: formData.value.user_password
+    }
+
     // Call registration API
     const response = await apiRequest(
       `${config.public.apiBaseUrl}/api/client/v2/auth/create-account`,

@@ -37,8 +37,14 @@
                 <td colspan="6" class="px-6 py-16 text-center">
                   <div class="flex flex-col items-center">
                     <span class="material-icons text-gray-400 text-5xl mb-4">receipt_long</span>
-                    <p class="text-gray-500 text-lg">No transactions available</p>
-                    <p class="text-gray-400">Your transaction history will appear here</p>
+                    <p class="text-gray-500 text-lg font-medium">No transactions yet</p>
+                    <p class="text-gray-400 mb-4">Your transaction history will appear here once you start making transactions.</p>
+                    <!-- <NuxtLink 
+                      to="/dashboard/fund-wallet" 
+                      class="inline-block px-4 py-2 bg-[#1a3c6d] text-white rounded-lg hover:bg-[#2a4c8d] transition-colors"
+                    >
+                      Fund Your Wallet
+                    </NuxtLink> -->
                   </div>
                 </td>
               </tr>
@@ -62,7 +68,14 @@
         <div class="md:hidden">
           <div v-if="transactions.length === 0" class="p-6 text-center">
             <span class="material-icons text-gray-400 text-4xl mb-2">receipt_long</span>
-            <p class="text-gray-500">No transactions available</p>
+            <p class="text-gray-500 font-medium">No transactions yet</p>
+            <p class="text-gray-400 mb-4">Your transaction history will appear here once you start making transactions.</p>
+            <!-- <NuxtLink 
+              to="/dashboard/fund-wallet" 
+              class="inline-block px-4 py-2 bg-[#1a3c6d] text-white rounded-lg hover:bg-[#2a4c8d] transition-colors"
+            >
+              Fund Your Wallet
+            </NuxtLink> -->
           </div>
           
           <div v-else class="divide-y divide-gray-200">
@@ -101,24 +114,8 @@
 definePageMeta({
   middleware: ['auth']
 })
-const transactions = ref([
-  {
-    date: '2024-12-06',
-    id: 'TRX-001',
-    description: 'UBA Rights Issue Subscription',
-    type: 'Debit',
-    amount: '50,000.00',
-    status: 'Completed'
-  },
-  {
-    date: '2024-12-05',
-    id: 'TRX-002',
-    description: 'Wallet Funding',
-    type: 'Credit',
-    amount: '100,000.00',
-    status: 'Completed'
-  }
-])
+
+const transactions = ref([]);
 
 const getTypeClass = (type) => ({
   'px-2 py-1 rounded-full text-xs font-medium': true,
