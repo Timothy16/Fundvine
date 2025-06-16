@@ -265,7 +265,7 @@ let successTimeout = null
 let errorTimeout = null
 
 
-const handlePasswordChange = async () => {
+const handlePasswordChangeOld = async () => {
   // Reset states
   isLoading.value = true
   error.value = ''
@@ -333,7 +333,72 @@ const handlePasswordChange = async () => {
     isLoading.value = false
   }
 }
+const handlePasswordChange = async () => {
+  // Reset states
+  isLoading.value = true
+  error.value = ''
+  success.value = ''
+  fieldErrors.value = {}
 
+  // Client-side validation
+  if (!currentPassword.value || !newPassword.value || !confirmPassword.value) {
+    error.value = 'All fields are required'
+    isLoading.value = false
+    return
+  }
+
+  if (newPassword.value !== confirmPassword.value) {
+    error.value = 'New password and confirm password do not match'
+    isLoading.value = false
+    return
+  }
+
+  try {
+    const payload = {
+      old_password: currentPassword.value,
+      password: newPassword.value,
+      confirm_password: confirmPassword.value
+    }
+
+    // Call the server API route instead of external API directly
+    const response = await $fetch('/api/change-password', {
+      method: 'POST',
+      body: payload
+    })
+
+    // Success
+    success.value = 'Password changed successfully!'
+    
+    // Clear form
+    currentPassword.value = ''
+    newPassword.value = ''
+    confirmPassword.value = ''
+
+  } catch (err) {
+    console.error('Password change error:', err)
+    
+    // Handle validation errors (422)
+    if (err.statusCode === 422 && err.data?.errors) {
+      const errors = {}
+      err.data.errors.forEach(error => {
+        // Map API field names to form field names
+        if (error.field === 'old_password') {
+          errors.currentPassword = error.message
+        } else if (error.field === 'password') {
+          errors.newPassword = error.message
+        } else if (error.field === 'confirm_password') {
+          errors.confirmPassword = error.message
+        }
+      })
+      fieldErrors.value = errors
+    } else {
+      // Handle other errors
+      error.value = err.statusMessage || err.message || 'Failed to change password. Please try again.'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 // Clear errors when user types (but keep success message)
 watch([currentPassword, newPassword, confirmPassword], () => {
   error.value = ''
