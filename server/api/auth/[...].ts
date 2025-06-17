@@ -59,9 +59,11 @@ export default NuxtAuthHandler({
               
               full_name: string;
               last_name: string;
-              is_corporate: boolean ;
+              is_corporate: boolean;
               email_verified: boolean;
               account_approved: boolean;
+              email: string;
+              profile_image : string
               
             }
           }>(
@@ -89,6 +91,8 @@ export default NuxtAuthHandler({
             last_name: profileResponse.data.last_name,
             is_corporate: profileResponse.data.is_corporate,
             email_verified: profileResponse.data.email_verified,
+            email: profileResponse.data.email,
+             profile_image: profileResponse.data.profile_image,
             account_approved: profileResponse.data.account_approved,
             accessToken: loginResponse.data.token,
             profile: profileResponse.data
@@ -120,7 +124,7 @@ export default NuxtAuthHandler({
     // Always fetch fresh user data in session callback
     async session({ session, token }) {
       if (token.accessToken) {
-        console.log('Session callback - Always fetching fresh user data...')
+        // console.log('Session callback - Always fetching fresh user data...')
         
         try {
           // Always fetch fresh profile data from API
@@ -133,6 +137,8 @@ export default NuxtAuthHandler({
               is_corporate: boolean;
               email_verified: boolean;
               account_approved: boolean;
+              email: string;
+              profile_image : string
             }
           }>(
             config.apiBaseUrl + '/api/client/v2/profile/my-account',
@@ -145,16 +151,18 @@ export default NuxtAuthHandler({
             }
           )
           
-          console.log('Fresh profile API response:', {
-            status: profileResponse?.status_code,
-            email_verified: profileResponse?.data?.email_verified
-          })
+          // console.log('Fresh profile API response:', {
+          //   status: profileResponse?.status_code,
+          //   email_verified: profileResponse?.data?.email_verified
+          // })
           
           if (profileResponse && profileResponse.status_code === 200) {
             // Always use fresh data from API
             session.user = {
               full_name: profileResponse.data.full_name,
               last_name: profileResponse.data.last_name,
+              email: profileResponse.data.email,
+              profile_image: profileResponse.data.profile_image,
               is_corporate: profileResponse.data.is_corporate,
               email_verified: profileResponse.data.email_verified,
               account_approved: profileResponse.data.account_approved,
@@ -162,9 +170,9 @@ export default NuxtAuthHandler({
               profile: profileResponse.data
             }
             
-            console.log('Session updated with fresh user data:', { 
-              email_verified: session.user.email_verified 
-            })
+            // console.log('Session updated with fresh user data:', { 
+            //   email_verified: session.user.email_verified 
+            // })
           } else {
             console.error('Failed to fetch fresh profile data')
             // Fallback to token data if API fails

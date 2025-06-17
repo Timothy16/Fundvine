@@ -342,6 +342,9 @@
   </div>
 </template>
 <script setup>
+import { useToast } from 'vue-toastification'
+
+const toast = useToast()
 // Form data
 const formData = ref({
   nin: '',
@@ -514,7 +517,8 @@ const handleSubmit = async () => {
     })
 
     // Success
-    success.value = 'Your basic information has been saved successfully!'
+    toast.success('Your kyc information has been saved successfully!');
+    success.value = 'Your kyc information has been saved successfully!'
 
   } catch (err) {
     console.error('KYC submission error:', err)

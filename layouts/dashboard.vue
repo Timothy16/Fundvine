@@ -61,8 +61,15 @@
         </button>
         <div class="flex items-center">
           <p class="mr-3">{{ currentPageTitle }}</p>
-          <div class="h-8 w-8 rounded-full bg-green-700 text-white flex items-center justify-center">
-            {{ userInitials }}
+          <!-- Profile Image or Initials (Mobile) -->
+          <div class="h-8 w-8 rounded-full overflow-hidden bg-green-700 text-white flex items-center justify-center">
+            <img 
+              v-if="user?.profile?.profile_image" 
+              :src="user.profile.profile_image" 
+              :alt="user?.full_name || 'User'"
+              class="w-full h-full object-cover"
+            />
+            <span v-else class="text-sm font-medium">{{ userInitials }}</span>
           </div>
         </div>
       </header>
@@ -79,8 +86,14 @@
               <p class="font-medium">{{ user?.full_name || 'User' }}</p>
               <p class="text-sm text-gray-600">{{ user?.email || 'No email' }}</p>
             </div>
-            <div class="h-10 w-10 rounded-full bg-green-700 text-white flex items-center justify-center">
-              {{ userInitials }}
+            <div class="h-10 w-10 rounded-full overflow-hidden bg-green-700 text-white flex items-center justify-center">
+              <img 
+                v-if="user?.profile?.profile_image" 
+                :src="user.profile.profile_image" 
+                :alt="user?.full_name || 'User'"
+                class="w-full h-full object-cover"
+              />
+              <span v-else class="font-medium">{{ userInitials }}</span>
             </div>
           </div>
         </div>
@@ -181,6 +194,8 @@ const userInitials = computed(() => {
     .slice(0, 2) // Take first 2 initials
     .join('')
 })
+
+
 
 // Reactive page title and description based on current route
 const currentPageTitle = computed(() => {

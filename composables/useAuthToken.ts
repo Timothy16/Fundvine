@@ -6,12 +6,16 @@ export interface User {
   email_verified: boolean;
   account_approved: boolean;
   accessToken: string;
+  email: string;
+  profile_image : string
   profile: {
     full_name: string;
     last_name: string;
     is_corporate: boolean;
     email_verified: boolean;
     account_approved: boolean;
+    email: string;
+    profile_image : string
   };
 }
 

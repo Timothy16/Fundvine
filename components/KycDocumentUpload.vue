@@ -5,17 +5,30 @@
     <!-- Enhanced Document Type Selection -->
     <div class="mb-6">
       <label class="block text-gray-700 mb-2">Choose document type</label>
-      <div class="w-full md:w-1/2 relative">
+      
+      <!-- Loading state for document types -->
+      <div v-if="isLoadingDocTypes" class="w-full md:w-1/2">
+        <div class="flex items-center justify-center px-4 py-3 border rounded-lg bg-gray-50">
+          <svg class="animate-spin h-5 w-5 text-gray-500 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span class="text-gray-500">Loading document types...</span>
+        </div>
+      </div>
+
+      <!-- Document type dropdown -->
+      <div v-else class="w-full md:w-1/2 relative">
         <button 
           @click="isDropdownOpen = !isDropdownOpen"
           class="w-full flex items-center justify-between px-4 py-3 border rounded-lg bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1a3c6d]"
         >
           <div class="flex items-center gap-3">
             <span v-if="selectedDocType" class="material-icons text-[#1a3c6d]">
-              {{ getDocumentIcon(selectedDocType) }}
+              {{ getDocumentIcon(selectedDocType.name) }}
             </span>
             <span v-if="!selectedDocType" class="text-gray-500">Select document type</span>
-            <span v-else class="text-gray-900">{{ getDocumentName(selectedDocType) }}</span>
+            <span v-else class="text-gray-900">{{ selectedDocType.name }}</span>
           </div>
           <span class="material-icons text-gray-400" :class="{ 'rotate-180': isDropdownOpen }">
             expand_more
@@ -29,15 +42,14 @@
         >
           <button
             v-for="option in documentTypes"
-            :key="option.value"
-            @click="selectDocument(option.value)"
+            :key="option.id"
+            @click="selectDocument(option)"
             class="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50"
-            :class="{ 'bg-blue-50': selectedDocType === option.value }"
+            :class="{ 'bg-blue-50': selectedDocType?.id === option.id }"
           >
-            <span class="material-icons text-[#1a3c6d]">{{ option.icon }}</span>
+            <span class="material-icons text-[#1a3c6d]">{{ getDocumentIcon(option.name) }}</span>
             <div class="text-left">
-              <p class="font-medium text-gray-900">{{ option.label }}</p>
-              <p class="text-sm text-gray-500">{{ option.description }}</p>
+              <p class="font-medium text-gray-900">{{ option.name }}</p>
             </div>
           </button>
         </div>
@@ -82,10 +94,17 @@
                   </button>
                 </div>
               </div>
-              <div class="flex-shrink-0">
+              <div class="flex-shrink-0 flex flex-col gap-2">
                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                   <span class="material-icons text-green-600 text-xl">check</span>
                 </div>
+                <button 
+                  @click="uploadDocument('front')"
+                  :disabled="isUploading || !selectedDocType"
+                  class="px-3 py-1 text-xs bg-[#1a3c6d] text-white rounded hover:bg-[#153154] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ isUploading && uploadingSide === 'front' ? 'Uploading...' : 'Upload' }}
+                </button>
               </div>
             </div>
           </div>
@@ -143,10 +162,17 @@
                   </button>
                 </div>
               </div>
-              <div class="flex-shrink-0">
+              <div class="flex-shrink-0 flex flex-col gap-2">
                 <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                   <span class="material-icons text-green-600 text-xl">check</span>
                 </div>
+                <button 
+                  @click="uploadDocument('back')"
+                  :disabled="isUploading || !selectedDocType"
+                  class="px-3 py-1 text-xs bg-[#1a3c6d] text-white rounded hover:bg-[#153154] disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {{ isUploading && uploadingSide === 'back' ? 'Uploading...' : 'Upload' }}
+                </button>
               </div>
             </div>
           </div>
@@ -173,50 +199,87 @@
         </div>
       </div>
     </div>
-
-    <!-- Submit Button -->
-    <button 
-      @click="submitKYC"
-      :disabled="!isFormValid || isLoading"
-      class="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-medium transition-all"
-      :class="[
-        isFormValid && !isLoading ? 'bg-[#1a3c6d] text-white hover:bg-[#153154]' : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-      ]"
-    >
-      <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      <span class="material-icons" v-if="isFormValid && !isLoading">upload_file</span>
-      {{ isLoading ? 'Uploading...' : 'Submit Documents' }}
-    </button>
   </div>
 </template>
 <script setup>
-const selectedDocType = ref('')
+import { useToast } from 'vue-toastification'
+// Document types state
+const documentTypes = ref([])
+const isLoadingDocTypes = ref(false)
+const selectedDocType = ref(null)
+
+// Upload state
 const frontDocument = ref(null)
 const backDocument = ref(null)
 const isDropdownOpen = ref(false)
 const isDraggingFront = ref(false)
 const isDraggingBack = ref(false)
-const isLoading = ref(false)
+const isUploading = ref(false)
+const uploadingSide = ref('')
 
+// Toast (assuming you have this implemented)
+const toast = useToast() // or however your toast is imported
+
+// Computed property for form validation
 const isFormValid = computed(() => {
-  return selectedDocType.value && frontDocument.value && backDocument.value
+  return selectedDocType.value && (frontDocument.value || backDocument.value)
 })
+
+// Fetch document types on mount
+onMounted(() => {
+  fetchDocumentTypes()
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+      isDropdownOpen.value = false
+    }
+  })
+})
+
+const fetchDocumentTypes = async () => {
+  isLoadingDocTypes.value = true
+  
+  try {
+    const response = await $fetch('/api/get-means-of-ids', {
+      method: 'GET'
+    })
+    
+    documentTypes.value = response.data
+  } catch (error) {
+    console.error('Failed to fetch document types:', error)
+    toast.error('Failed to load document types. Please refresh the page.')
+  } finally {
+    isLoadingDocTypes.value = false
+  }
+}
+
+const getDocumentIcon = (name) => {
+  const lowerName = name.toLowerCase()
+  if (lowerName.includes('passport')) return 'flight'
+  if (lowerName.includes('license') || lowerName.includes('licence')) return 'directions_car'
+  if (lowerName.includes('national') || lowerName.includes('identity')) return 'badge'
+  if (lowerName.includes('voter')) return 'how_to_vote'
+  return 'description'
+}
+
+const selectDocument = (option) => {
+  selectedDocType.value = option
+  isDropdownOpen.value = false
+}
 
 const handleFileUpload = (side, event) => {
   const file = event.target.files[0]
   if (file) {
     if (file.size > 2 * 1024 * 1024) { // 2MB limit
-      alert('File size should not exceed 2MB')
+      toast.error('File size should not exceed 2MB')
       return
     }
     
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf']
     if (!allowedTypes.includes(file.type)) {
-      alert('Only JPG, JPEG, PNG, and PDF files are allowed')
+      toast.error('Only JPG, JPEG, PNG, and PDF files are allowed')
       return
     }
     
@@ -228,62 +291,6 @@ const handleFileUpload = (side, event) => {
   }
 }
 
-const removeDocument = (side) => {
-  if (side === 'front') {
-    frontDocument.value = null
-  } else {
-    backDocument.value = null
-  }
-}
-
-const documentTypes = [
-  {
-    value: 'drivingLicense',
-    label: 'Driving License',
-    icon: 'directions_car',
-    description: 'Valid driver\'s license with photo ID'
-  },
-  {
-    value: 'nationalId',
-    label: 'National ID',
-    icon: 'badge',
-    description: 'Government-issued national identity card'
-  },
-  {
-    value: 'passport',
-    label: 'International Passport',
-    icon: 'flight',
-    description: 'Valid international passport'
-  },
-  {
-    value: 'votersCard',
-    label: 'Voter\'s Card',
-    icon: 'how_to_vote',
-    description: 'Valid voter\'s registration card'
-  }
-]
-
-const getDocumentIcon = (type) => {
-  const doc = documentTypes.find(d => d.value === type)
-  return doc ? doc.icon : 'description'
-}
-
-const getDocumentName = (type) => {
-  const doc = documentTypes.find(d => d.value === type)
-  return doc ? doc.label : ''
-}
-
-const getFileIcon = (type) => {
-  if (type.includes('pdf')) return 'picture_as_pdf'
-  if (type.includes('image')) return 'image'
-  return 'insert_drive_file'
-}
-
-const selectDocument = (value) => {
-  selectedDocType.value = value
-  isDropdownOpen.value = false
-}
-
 const handleDrop = (side, event) => {
   const file = event.dataTransfer.files[0]
   if (file) {
@@ -291,6 +298,14 @@ const handleDrop = (side, event) => {
   }
   if (side === 'front') isDraggingFront.value = false
   else isDraggingBack.value = false
+}
+
+const removeDocument = (side) => {
+  if (side === 'front') {
+    frontDocument.value = null
+  } else {
+    backDocument.value = null
+  }
 }
 
 const viewDocument = (side) => {
@@ -304,6 +319,12 @@ const viewDocument = (side) => {
   }
 }
 
+const getFileIcon = (type) => {
+  if (type.includes('pdf')) return 'picture_as_pdf'
+  if (type.includes('image')) return 'image'
+  return 'insert_drive_file'
+}
+
 const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
@@ -312,51 +333,58 @@ const formatFileSize = (bytes) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(0)) + ' ' + sizes[i]
 }
 
-const submitKYC = async () => {
-  if (!isFormValid.value) {
-    alert('Please select document type and upload both front and back documents')
+const uploadDocument = async (side) => {
+  if (!selectedDocType.value) {
+    toast.error('Please select a document type first')
     return
   }
 
-  isLoading.value = true
+  const file = side === 'front' ? frontDocument.value : backDocument.value
+  if (!file) {
+    toast.error('Please select a file to upload')
+    return
+  }
+
+  isUploading.value = true
+  uploadingSide.value = side
 
   try {
     // Create FormData for file upload
     const formData = new FormData()
-    formData.append('document_type', selectedDocType.value)
-    formData.append('front_document', frontDocument.value)
-    formData.append('back_document', backDocument.value)
+    formData.append('document', file)
+    formData.append('target', side)
+    formData.append('means_id', selectedDocType.value.id)
 
-    // Here you would call your upload API
-    // const response = await apiRequest('/api/client/v2/profile/upload-documents', {
-    //   method: 'POST',
-    //   body: formData
-    // })
+    const response = await $fetch('/api/upload-means-of-id', {
+      method: 'POST',
+      body: formData
+    })
 
-    // For now, just simulate upload
-    await new Promise(resolve => setTimeout(resolve, 2000))
+    // Success
+    // toast.success(`${side === 'front' ? 'Front' : 'Back'} document uploaded successfully!`)
+     const apiMessage = response.data?.message || response.message || 'Document uploaded successfully'
+    toast.success(apiMessage)
     
-    alert('Documents uploaded successfully!')
-    
-    // Reset form
-    selectedDocType.value = ''
-    frontDocument.value = null
-    backDocument.value = null
+    // Reset the uploaded document
+    if (side === 'front') {
+      frontDocument.value = null
+    } else {
+      backDocument.value = null
+    }
 
   } catch (error) {
     console.error('Upload error:', error)
-    alert('Failed to upload documents. Please try again.')
+    toast.error(error.statusMessage || error.message || 'Failed to upload document. Please try again.')
   } finally {
-    isLoading.value = false
+    isUploading.value = false
+    uploadingSide.value = ''
   }
 }
 
-// Close dropdown when clicking outside
-onMounted(() => {
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.relative')) {
-      isDropdownOpen.value = false
-    }
-  })
-})
+// Legacy method (if needed for compatibility)
+const submitKYC = async () => {
+  // This method can be removed if not needed anymore
+  // or kept for backward compatibility
+  console.warn('submitKYC is deprecated, use individual upload buttons instead')
+}
 </script>
