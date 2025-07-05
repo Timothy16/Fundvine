@@ -9,10 +9,9 @@ export default defineNuxtConfig({
     apiSecret: process.env.API_SECRET,
   },
   app: {
-    head: {
-      title: 'RtechBiz Admin Dashboard',
+      title: 'Fundvine',
       meta: [
-        { name: 'description', content: 'Admin Dashboard for managing transactions' }
+        { name: 'description', content: 'Fundvine for managing transactions' }
       ],
       link: [
         // { rel: 'icon', type: 'image/x-icon', href: '/favicon.jpg' },
