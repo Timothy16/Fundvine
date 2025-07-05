@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     apiSecret: process.env.API_SECRET,
   },
   app: {
+    head: {
       title: 'Fundvine',
       meta: [
         { name: 'description', content: 'Fundvine for managing transactions' }
