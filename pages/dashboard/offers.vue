@@ -69,7 +69,7 @@
           <p class="text-sm text-gray-500">Available Balance</p>
         </div>
       </div>
-      <div class="mb-4">
+      <div class="mb-4 b">
         <p class="text-3xl font-bold text-gray-800">${{ formatCurrency(usdBalance) }}</p>
         <p class="text-sm text-blue-600 mt-1">
           <i class="fa fa-arrow-up"></i>
