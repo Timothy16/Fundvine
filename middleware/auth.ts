@@ -37,7 +37,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     // If we're on login page and user is authenticated, redirect based on email verification
     if (to.path === '/login') {
       if (user?.email_verified) {
-        return navigateTo('/dashboard/offers')
+        return navigateTo('/dashboard')
       } else {
         return navigateTo('/verify-account')
       }
@@ -45,7 +45,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     
     // If trying to access verify-account but email is already verified
     if (to.path === '/verify-account' && user?.email_verified) {
-      return navigateTo('/dashboard/offers')
+      return navigateTo('/dashboard')
     }
     
     // If trying to access dashboard pages but email is not verified

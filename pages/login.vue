@@ -147,7 +147,7 @@ const handleLogin = async () => {
       // Check if email is verified
       if (user?.email_verified) {
         // Email is verified, go to dashboard
-        router.push('/dashboard/offers')
+        router.push('/dashboard')
       } else {
         // Email not verified, go to verification page
         router.push('/verify-account')
