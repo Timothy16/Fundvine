@@ -558,6 +558,7 @@ const proceedToPayment = () => {
       metadata: {
         wallet_topup: `${selectedCurrency.value.toUpperCase()} ${amount.value}`,
         user_id: user.value?.id || 'guest',
+        tnx_target : 'wallet_topup',
         custom_fields: [
           {
             display_name: 'Wallet Top-up',
