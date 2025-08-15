@@ -561,7 +561,7 @@ const proceedToPayment = () => {
         custom_fields: [
           {
             display_name: 'Wallet Top-up',
-            variable_name: 'wallet_topup',
+            value_name: 'wallet_topup',
             value: `${selectedCurrency.value.toUpperCase()} ${amount.value}`
           }
         ]

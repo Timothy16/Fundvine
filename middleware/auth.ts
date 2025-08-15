@@ -18,7 +18,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     let user = authData.value?.user
     
     // For protected routes, ensure we have the latest session data
-    const protectedRoutes = ['/dashboard', '/kyc', '/settings', '/transactions']
+    const protectedRoutes = ['/dashboard', '/kyc', '/settings', '/transactions', '/dashboard/payment']
     const isProtectedRoute = protectedRoutes.some(route => to.path.startsWith(route))
     
     // Force refresh session for protected routes to get latest user data
@@ -50,6 +50,11 @@ export default defineNuxtRouteMiddleware(async (to) => {
     
     // If trying to access dashboard pages but email is not verified
     if (to.path.startsWith('/dashboard') && !user?.email_verified) {
+      console.log('Middleware: Redirecting to verify-account, email_verified:', user?.email_verified)
+      return navigateTo('/verify-account')
+    }
+
+    if (to.path.startsWith('/dashboard/payment') && !user?.email_verified) {
       console.log('Middleware: Redirecting to verify-account, email_verified:', user?.email_verified)
       return navigateTo('/verify-account')
     }
