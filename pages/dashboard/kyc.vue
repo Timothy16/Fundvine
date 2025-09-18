@@ -2,10 +2,16 @@
   <NuxtLayout name="dashboard">
     <div class="p-4 md:p-6">
       <div class="bg-white rounded-lg shadow-sm p-6">
+        {{ userProfile.is_kyc_complete }}
         <!-- Header -->
         <div class="flex items-center gap-3 mb-6">
           <h2 class="text-xl font-semibold">Profile</h2>
-          <span class="px-3 py-1 bg-orange-100 text-orange-800 rounded-full text-sm">KYC Pending</span>
+          <span 
+            class="px-3 py-1 rounded-full text-sm"
+            :class="userProfile.is_kyc_complete ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'"
+          >
+            {{ userProfile.is_kyc_complete ? 'KYC Completed' : 'KYC Pending' }}
+          </span>
         </div>
 
         <!-- Tabs -->
@@ -52,11 +58,13 @@
 definePageMeta({
   middleware: ['auth']
 })
-
+const { data: authData, getSession } = useAuth()
 // Import child components
 import KycBasicInformation from '~/components/KycBasicInformation.vue'
 import KycDocumentUpload from '~/components/KycDocumentUpload.vue'
 
 // Tab state
 const activeTab = ref('basic')
+
+const userProfile = computed(() => authData.value?.user?.profile)
 </script>

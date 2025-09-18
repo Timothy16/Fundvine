@@ -25,13 +25,13 @@
             Offers
           </NuxtLink>
           <NuxtLink 
-            to="/dashboard/savings-plan" 
-            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/savings-plan' }"
-          >
-            <i class="fas fa-piggy-bank mr-3"></i>
-            Savings Plan
-          </NuxtLink>
+              to="/dashboard/mutual-funds" 
+              class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+              :class="{ 'bg-[#ffa500]': route.path === '/dashboard/mutual-funds' }"
+            >
+              <i class="fas fa-chart-pie mr-3"></i>
+              Mutual Funds
+            </NuxtLink>
           <NuxtLink 
             to="/dashboard/loans" 
             class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
@@ -193,46 +193,73 @@
               <span class="material-icons">close</span>
             </button>
           </div>
-          <nav class="mt-4">
-            <div class="px-4 space-y-2">
-              <NuxtLink 
-                to="/dashboard/offers" 
-                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/offers' }"
-                @click="isSidebarOpen = false"
-              >
-                <span class="material-icons mr-3">local_offer</span>
-                Offers
-              </NuxtLink>
-              <!-- <NuxtLink 
-                to="/dashboard/transactions" 
-                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/transactions' }"
-                @click="isSidebarOpen = false"
-              >
-                <span class="material-icons mr-3">history</span>
-                Transaction History
-              </NuxtLink> -->
-              <!-- <NuxtLink 
-                to="/dashboard/kyc" 
-                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/kyc' }"
-                @click="isSidebarOpen = false"
-              >
-                <span class="material-icons mr-3">verified_user</span>
-                KYC
-              </NuxtLink> -->
-              <NuxtLink 
-                to="/dashboard/settings" 
-                class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
-                :class="{ 'bg-[#ffa500]': route.path === '/dashboard/settings' }"
-                @click="isSidebarOpen = false"
-              >
-                <span class="material-icons mr-3">settings</span>
-                Settings
-              </NuxtLink>
-            </div>
-          </nav>
+            <nav class="mt-4">
+              <div class="px-4 space-y-2">
+                <NuxtLink 
+                  to="/dashboard" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-tachometer-alt mr-3"></i>
+                  Dashboard
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/offers" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/offers' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-tag mr-3"></i>
+                  Offers
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/mutual-funds" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/mutual-funds' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-chart-pie mr-3"></i>
+                  Mutual Funds
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/loans" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/loans' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-hand-holding-usd mr-3"></i>
+                  Loans
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/equity-market" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/equity-market' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-chart-line mr-3"></i>
+                  Equity Market
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/transactions" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/transactions' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-history mr-3"></i>
+                  Transaction History
+                </NuxtLink>
+                <NuxtLink 
+                  to="/dashboard/settings" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/settings' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-cog mr-3"></i>
+                  Settings
+                </NuxtLink>
+              </div>
+            </nav>
         </div>
       </div>
     </transition>
@@ -284,8 +311,8 @@ const currentPageTitle = computed(() => {
       return 'Dashboard'
     case '/dashboard/offers':
       return 'Offers'
-    case '/dashboard/savings-plan':
-      return 'Savings Plan'
+    case '/dashboard/mutual-funds':
+      return 'Mutual Funds'
     case '/dashboard/loans':
       return 'Loans'
     case '/dashboard/equity-market':
@@ -307,8 +334,8 @@ const currentPageDescription = computed(() => {
       return 'Welcome to your Investment Portfolio'
     case '/dashboard/offers':
       return 'Explore available investment opportunities'
-    case '/dashboard/savings-plan':
-      return 'Manage your savings goals and plans'
+    case '/dashboard/mutual-funds':
+      return 'Explore and manage mutual fund investments'
     case '/dashboard/loans':
       return 'View and manage your loan products'
     case '/dashboard/equity-market':

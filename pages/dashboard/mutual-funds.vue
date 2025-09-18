@@ -2,7 +2,7 @@
 <template>
     <NuxtLayout name="dashboard">
          <div>
-            <ComingSoon page-type="savings-plan" />
+            <ComingSoon page-type="mutual-funds" />
         </div>
     </NuxtLayout>
  

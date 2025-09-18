@@ -1,27 +1,60 @@
 // pages/dashboard/index.vue
 <template>
     <NuxtLayout name="dashboard">
-        <div class="p-6">
+        <div class="p-2 sm:p-6">
            
             <!-- Investment Portfolio Section -->
             <div class="mb-8">
                 <!-- Portfolio Header -->
-                <div class="flex items-center justify-between mb-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                     <div>
-                        <h2 class="text-2xl font-bold text-gray-800">Investment Portfolio</h2>
-                        <p class="text-gray-600">Track your investments and portfolio performance</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Investment Portfolio</h2>
+                    <p class="text-gray-600 text-sm sm:text-base">
+                        Track your investments and portfolio performance
+                    </p>
                     </div>
+
                     <button
-                        @click="openAddMoneyModal"
-                        class="bg-[#1a3c6d] text-white px-6 py-3 rounded-lg hover:bg-[#2a4c7d] transition-colors flex items-center space-x-2 shadow-lg"
+                    @click="openAddMoneyModal"
+                    class="bg-[#1a3c6d] text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-[#2a4c7d] transition-colors flex items-center justify-center sm:justify-start space-x-2 shadow-lg w-full sm:w-auto"
                     >
-                        <i class="fa fa-plus"></i>
-                        <span>Add Money</span>
+                    <i class="fa fa-plus"></i>
+                    <span>Fund Wallet</span>
                     </button>
                 </div>
 
                 <!-- Investment Cards -->
-                <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                    <!-- Current Wallet Balance Card -->
+                    <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-wallet text-white text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-800">Current Wallet Balance</h3>
+                                    <p class="text-sm text-gray-600">Available Funds</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Ready to Invest</p>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-3xl font-bold text-gray-800">₦{{ formatCurrency(nairaBalance) }}</p>
+                            <p class="text-sm text-purple-600 mt-1">
+                                <i class="fa fa-check-circle"></i>
+                                Available for investment
+                            </p>
+                        </div>
+                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                            <span class="text-sm text-gray-600">Last updated: {{ lastUpdated }}</span>
+                            <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                                View History
+                            </button>
+                        </div>
+                    </div>
                     <!-- Total Investment Card -->
                     <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-4">
@@ -83,6 +116,7 @@
                             </button>
                         </div>
                     </div>
+                    
                 </div>
 
                 <!-- Investment Diversification Section -->
@@ -234,7 +268,7 @@
                                 </label>
 
                                 <!-- USD Option -->
-                                <label 
+                                <!-- <label 
                                     class="p-4 border rounded-lg cursor-pointer block transition-all duration-200 hover:border-blue-300" 
                                     :class="selectedCurrency === 'usd' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'"
                                 >
@@ -257,7 +291,7 @@
                                             <p class="text-xs text-blue-600 mt-1 font-medium">Current Balance: ${{ formatCurrency(usdBalance) }}</p>
                                         </div>
                                     </div>
-                                </label>
+                                </label> -->
                             </div>
 
                             <!-- Step 1 Action Buttons -->
@@ -345,12 +379,7 @@
                                             {{ selectedCurrency === 'naira' ? '₦' : '$' }}{{ formatCurrency(parseFloat(amount) || 0) }}
                                         </span>
                                     </div>
-                                    <div class="flex items-center justify-between mb-2">
-                                        <span class="text-sm text-gray-600">Processing Fee:</span>
-                                        <span class="font-medium text-gray-800">
-                                            {{ selectedCurrency === 'naira' ? '₦' : '$' }}{{ formatCurrency(calculateFee(parseFloat(amount) || 0)) }}
-                                        </span>
-                                    </div>
+                                    
                                     <hr class="my-2">
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm font-medium text-gray-800">Total to pay:</span>
@@ -458,7 +487,7 @@ const calculateFee = (amount) => {
 }
 
 const calculateTotal = (amount) => {
-  return amount + calculateFee(amount)
+  return amount 
 }
 
 const validateAmount = () => {
@@ -532,9 +561,9 @@ const proceedToPayment = () => {
     // Generate unique reference
     const reference = generateReference('NGX_')
     
-    // Convert amount to kobo (NGN) or cents (USD)
-    const totalAmount = calculateTotal(parseFloat(amount.value))
-    const amountInMinorUnit = Math.round(totalAmount * 100) // Convert to kobo/cents
+    // Use the exact amount user entered (no fees added)
+    const userAmount = parseFloat(amount.value)
+    const amountInMinorUnit = Math.round(userAmount * 100) // Convert to kobo/cents
     
     // Get customer email
     const customerEmail = user.value?.email || 'user@example.com'
@@ -544,7 +573,7 @@ const proceedToPayment = () => {
       reference,
       amount: amount.value,
       currency: selectedCurrency.value,
-      total: totalAmount,
+      total: userAmount,
       timestamp: Date.now()
     }))
     

@@ -7,6 +7,7 @@ export interface User {
   account_approved: boolean;
   accessToken: string;
   email: string;
+  is_kyc_complete: boolean, 
   profile_image : string
   profile: {
     full_name: string;

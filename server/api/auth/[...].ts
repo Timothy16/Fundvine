@@ -56,14 +56,14 @@ export default NuxtAuthHandler({
             status_code: number;
             message: string;
             data: {
-              
               full_name: string;
               last_name: string;
               is_corporate: boolean;
               email_verified: boolean;
               account_approved: boolean;
               email: string;
-              profile_image : string
+              profile_image : string,
+              is_kyc_complete : boolean
               
             }
           }>(
@@ -92,6 +92,7 @@ export default NuxtAuthHandler({
             is_corporate: profileResponse.data.is_corporate,
             email_verified: profileResponse.data.email_verified,
             email: profileResponse.data.email,
+            is_kyc_complete: profileResponse.data.is_kyc_complete,
              profile_image: profileResponse.data.profile_image,
             account_approved: profileResponse.data.account_approved,
             accessToken: loginResponse.data.token,
@@ -137,6 +138,7 @@ export default NuxtAuthHandler({
               is_corporate: boolean;
               email_verified: boolean;
               account_approved: boolean;
+              is_kyc_complete: boolean;
               email: string;
               profile_image : string
             }
@@ -166,6 +168,7 @@ export default NuxtAuthHandler({
               is_corporate: profileResponse.data.is_corporate,
               email_verified: profileResponse.data.email_verified,
               account_approved: profileResponse.data.account_approved,
+              is_kyc_complete :profileResponse.data.is_kyc_complete,
               accessToken: token.accessToken,
               profile: profileResponse.data
             }

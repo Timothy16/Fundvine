@@ -58,13 +58,13 @@ const props = defineProps({
   pageType: {
     type: String,
     required: true,
-    validator: (value) => ['savings-plan', 'loans', 'equity-market'].includes(value)
+    validator: (value) => ['mutual-funds', 'loans', 'equity-market'].includes(value)
   }
 })
 
 // Configuration for different page types
 const pageConfig = {
-  'savings-plan': {
+  'mutual-funds': {
     title: 'Savings Plan',
     description: 'Build your financial future with our comprehensive savings plans. Set goals, track progress, and watch your money grow with competitive interest rates.',
     icon: 'PiggyBankIcon',
@@ -140,7 +140,7 @@ const features = computed(() => config.value.features)
 
 const getIconClass = () => {
   switch (props.pageType) {
-    case 'savings-plan':
+    case 'mutual-funds':
       return 'fa fa-piggy-bank'
     case 'loans':
       return 'fa fa-hand-holding-usd'
