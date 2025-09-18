@@ -48,7 +48,8 @@
                             </div>
                             <!-- Error state -->
                             <div v-else-if="walletError" class="text-3xl font-bold text-red-500">
-                                Error loading balance
+                                <!-- Error loading balance -->
+                                Not Available
                             </div>
                             <!-- Success state with currency symbol -->
                             <div v-else class="text-3xl font-bold text-gray-800">
