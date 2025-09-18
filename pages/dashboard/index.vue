@@ -16,7 +16,7 @@
 
                     <button
                     @click="openAddMoneyModal"
-                    class="bg-[#1a3c6d] text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-[#2a4c7d] transition-colors flex items-center justify-center sm:justify-start space-x-2 shadow-lg w-full sm:w-auto"
+                    class="bg-[#1a3c6d] text-white c px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-[#2a4c7d] transition-colors flex items-center justify-center sm:justify-start space-x-2 shadow-lg w-full sm:w-auto"
                     >
                     <i class="fa fa-plus"></i>
                     <span>Fund Wallet</span>
