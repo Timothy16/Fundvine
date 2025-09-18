@@ -24,7 +24,7 @@
                 </div>
 
                 <!-- Investment Cards -->
-                <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="grid md:grid-cols-2 gap-6 mb-8">
                     <!-- Current Wallet Balance Card -->
                     <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                         <div class="flex items-center justify-between mb-4">
@@ -42,7 +42,18 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <p class="text-3xl font-bold text-gray-800">₦{{ formatCurrency(nairaBalance) }}</p>
+                            <!-- Loading state -->
+                            <div v-if="isLoadingWallet" class="text-3xl font-bold text-gray-400">
+                                <i class="fas fa-spinner fa-spin"></i> Loading...
+                            </div>
+                            <!-- Error state -->
+                            <div v-else-if="walletError" class="text-3xl font-bold text-red-500">
+                                Error loading balance
+                            </div>
+                            <!-- Success state with currency symbol -->
+                            <div v-else class="text-3xl font-bold text-gray-800">
+                                <span v-if="walletCurrency.position === 'before'">{{ walletCurrency.symbol }}</span>{{ formatCurrency(walletBalance) }}<span v-if="walletCurrency.position === 'after'">{{ walletCurrency.symbol }}</span>
+                            </div>
                             <p class="text-sm text-purple-600 mt-1">
                                 <i class="fa fa-check-circle"></i>
                                 Available for investment
@@ -50,9 +61,19 @@
                         </div>
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200">
                             <span class="text-sm text-gray-600">Last updated: {{ lastUpdated }}</span>
-                            <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">
-                                View History
-                            </button>
+                            <div class="flex space-x-2">
+                                <button 
+                                    @click="fetchWalletBalance" 
+                                    class="text-purple-600 hover:text-purple-700 text-sm font-medium"
+                                    :disabled="isLoadingWallet"
+                                >
+                                    <i class="fas fa-sync-alt" :class="{ 'fa-spin': isLoadingWallet }"></i>
+                                    Refresh
+                                </button>
+                                <button class="text-purple-600 hover:text-purple-700 text-sm font-medium">
+                                    View History
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <!-- Total Investment Card -->
@@ -75,7 +96,7 @@
                             <p class="text-3xl font-bold text-gray-800">₦{{ formatCurrency(totalInvestment) }}</p>
                             <p class="text-sm text-blue-600 mt-1">
                                 <i class="fa fa-arrow-up"></i>
-                                +5.2% from last month
+                                +0% from last month
                             </p>
                         </div>
                         <div class="flex items-center justify-between pt-4 border-t border-gray-200">
@@ -86,37 +107,7 @@
                         </div>
                     </div>
 
-                    <!-- Accrued Value Card -->
-                    <div class="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-trending-up text-white text-lg"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-semibold text-gray-800">Accrued Value</h3>
-                                    <p class="text-sm text-gray-600">Returns & Interest</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-sm text-gray-500">Total Returns</p>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <p class="text-3xl font-bold text-gray-800">₦{{ formatCurrency(accruedValue) }}</p>
-                            <p class="text-sm text-green-600 mt-1">
-                                <i class="fa fa-arrow-up"></i>
-                                +{{ returnPercentage }}% Total Return
-                            </p>
-                        </div>
-                        <div class="flex items-center justify-between pt-4 border-t border-gray-200">
-                            <span class="text-sm text-gray-600">Last updated: {{ lastUpdated }}</span>
-                            <button class="text-green-600 hover:text-green-700 text-sm font-medium">
-                                View Breakdown
-                            </button>
-                        </div>
-                    </div>
-                    
+                  
                 </div>
 
                 <!-- Investment Diversification Section -->
@@ -434,10 +425,15 @@ const amount = ref('')
 const amountError = ref('')
 const isProcessing = ref(false)
 
+// Wallet
+const walletData = ref(null)
+const isLoadingWallet = ref(false)
+const walletError = ref(null)
+
 // Investment data
-const totalInvestment = ref(5000000.00)
+const totalInvestment = ref(0.00)
 const accruedValue = ref(750000.50)
-const nairaBalance = ref(2450000.50)
+const nairaBalance = ref(0.00)
 const usdBalance = ref(8750.25)
 
 // Get authenticated user data
@@ -559,7 +555,7 @@ const proceedToPayment = () => {
   
   try {
     // Generate unique reference
-    const reference = generateReference('NGX_')
+    const reference = generateReference('FVB_')
     
     // Use the exact amount user entered (no fees added)
     const userAmount = parseFloat(amount.value)
@@ -602,7 +598,7 @@ const proceedToPayment = () => {
         isProcessing.value = false
         
         // Navigate to success page with reference
-        navigateTo(`/dashboard/payment/success?ref=${response.reference}`)
+        navigateTo(`/dashboard/payment/success?reference=${response.reference}`)
       },
       onClose: function() {
         // Payment cancelled or window closed
@@ -610,7 +606,7 @@ const proceedToPayment = () => {
         isProcessing.value = false
         
         // Navigate to cancel page
-        navigateTo(`/dashboard/payment/cancel?ref=${reference}`)
+        navigateTo(`/dashboard/payment/cancel?reference=${reference}`)
       }
     })
     
@@ -642,9 +638,44 @@ const generateReference = (prefix) => {
   
   return result
 }
+const fetchWalletBalance = async () => {
+  try {
+    isLoadingWallet.value = true
+    walletError.value = null
+    
+    const response = await $fetch('/api/wallet-balance')
+    
+    if (response.success) {
+      walletData.value = response.data
+    } else {
+      walletError.value = 'Failed to load wallet balance'
+    }
+  } catch (error) {
+    console.error('Wallet fetch error:', error)
+    walletError.value = 'Failed to load wallet balance'
+  } finally {
+    isLoadingWallet.value = false
+  }
+}
+
+// Add computed property for wallet display
+const walletBalance = computed(() => {
+  if (!walletData.value) return 0
+  return walletData.value.availableBalance || 0
+})
+
+const walletCurrency = computed(() => {
+  if (!walletData.value?.currency) return { symbol: '₦', position: 'before' }
+  return walletData.value.currency
+})
+
+
 
 // Load Paystack script on component mount
 onMounted(() => {
+    // Fetch wallet balance
+  fetchWalletBalance()
+
   // Load the correct Paystack inline script
   const script = document.createElement('script')
   script.setAttribute('src', 'https://js.paystack.co/v1/inline.js')

@@ -111,9 +111,9 @@ const viewTransactionHistory = () => {
 
 // Verify payment on mount
 onMounted(async () => {
-  const ref = route.query.ref
+  const reference = route.query.reference
   
-  if (ref) {
+  if (reference) {
     isVerifying.value = true
     
     try {
@@ -121,7 +121,7 @@ onMounted(async () => {
       const storedData = localStorage.getItem('pending_transaction')
       if (storedData) {
         const parsedData = JSON.parse(storedData)
-        if (parsedData.reference === ref) {
+        if (parsedData.reference === reference) {
           transactionData.value = parsedData
         }
       }

@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
         is_corporate: profileResponse.data.is_corporate,
         email_verified: profileResponse.data.email_verified,
         account_approved: profileResponse.data.account_approved,
+        is_kyc_complete :profileResponse.data.is_kyc_complete,
         accessToken: session.user.accessToken,
         profile: profileResponse.data
       }
