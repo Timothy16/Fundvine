@@ -1,5 +1,5 @@
 // server/api/wallet-balance.get.ts
-// server/api/wallet.get.ts
+
 import { getServerSession } from '#auth'
 
 export default defineEventHandler(async (event) => {
