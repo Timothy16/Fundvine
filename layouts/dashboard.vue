@@ -2,7 +2,7 @@
 <template>
   <div class="flex h-screen bg-gray-100">
     <!-- Desktop Sidebar -->
-    <aside class="w-96 text-white hidden md:block sidebar-gradient relative">
+    <aside class="w-64 text-white hidden md:block sidebar-gradient relative">
       <div class="p-4">
         <img src="/images/logo.png" alt="NGX Logo" class="h-8" />
       </div>
@@ -31,6 +31,14 @@
             >
               <i class="fas fa-chart-pie mr-3"></i>
               Mutual Funds
+            </NuxtLink>
+          <NuxtLink 
+              to="/dashboard/my-subscriptions" 
+              class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+              :class="{ 'bg-[#ffa500]': route.path === '/dashboard/my-subscriptions' }"
+            >
+              <i class="fas fa-sync-alt mr-3"></i>
+              My Subscriptions
             </NuxtLink>
           <NuxtLink 
             to="/dashboard/loans" 
@@ -74,7 +82,7 @@
           </NuxtLink> -->
         </div>
       </nav>
-      <div class="absolute bottom-0 w-96 p-4">
+      <div class="absolute bottom-0 w-64 p-4">
         <button @click="handleLogout" class="flex items-center p-3 w-full hover:bg-[#ffa500] rounded-lg transition-colors">
           <span class="material-icons mr-3">logout</span>
           Logout

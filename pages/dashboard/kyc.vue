@@ -2,7 +2,6 @@
   <NuxtLayout name="dashboard">
     <div class="p-4 md:p-6">
       <div class="bg-white rounded-lg shadow-sm p-6">
-        {{ userProfile.is_kyc_complete }}
         <!-- Header -->
         <div class="flex items-center gap-3 mb-6">
           <h2 class="text-xl font-semibold">Profile</h2>

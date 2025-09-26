@@ -52,5 +52,8 @@ export default defineNuxtConfig({
       type: 'authjs'
     },
     // globalAppMiddleware: true
-  }
+  },
+  build: {
+    transpile: ['vue-toastification'],
+  },
 })
