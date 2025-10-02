@@ -32,35 +32,6 @@
 
         <!-- Form Fields -->
         <div class="space-y-4">
-          <!-- Liquidation Type (only for liquidate action) -->
-          <div v-if="actionType === 'liquidate'" class="space-y-3">
-            <label class="block text-sm font-medium text-gray-700">Liquidation Type</label>
-            <div class="space-y-2">
-              <label class="flex items-center cursor-pointer">
-                <input 
-                  v-model="liquidationType" 
-                  type="radio" 
-                  value="MATURITY" 
-                  class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                >
-                <span class="ml-3 text-sm text-gray-700">
-                  <span class="font-medium">Full Maturity</span> - Liquidate all units
-                </span>
-              </label>
-              <label class="flex items-center cursor-pointer">
-                <input 
-                  v-model="liquidationType" 
-                  type="radio" 
-                  value="PARTIAL" 
-                  class="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                >
-                <span class="ml-3 text-sm text-gray-700">
-                  <span class="font-medium">Partial</span> - Liquidate specific units
-                </span>
-              </label>
-            </div>
-          </div>
-
           <!-- Units Input -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -71,15 +42,9 @@
               type="number"
               :min="1"
               :max="actionType === 'liquidate' ? subscription?.totalUnits : undefined"
-              :disabled="actionType === 'liquidate' && liquidationType === 'MATURITY'"
               placeholder="Enter number of units"
-              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            
-            <!-- Auto-fill for full maturity -->
-            <div v-if="actionType === 'liquidate' && liquidationType === 'MATURITY'" class="mt-2">
-              <p class="text-sm text-blue-600">All {{ formatNumber(subscription?.totalUnits || 0) }} units will be liquidated</p>
-            </div>
             
             <!-- Validation Messages -->
             <div v-if="unitsError" class="mt-2 text-sm text-red-600">
@@ -154,7 +119,6 @@ const emit = defineEmits(['close', 'success', 'error'])
 
 // Reactive data
 const units = ref('')
-const liquidationType = ref('PARTIAL')
 const isProcessing = ref(false)
 const unitsError = ref('')
 
@@ -162,7 +126,6 @@ const unitsError = ref('')
 const isValidForm = computed(() => {
   if (!units.value || units.value <= 0) return false
   if (unitsError.value) return false
-  if (props.actionType === 'liquidate' && !liquidationType.value) return false
   return true
 })
 
@@ -217,7 +180,6 @@ const closeModal = () => {
 
 const resetForm = () => {
   units.value = ''
-  liquidationType.value = 'PARTIAL'
   unitsError.value = ''
 }
 
@@ -234,10 +196,6 @@ const performAction = async () => {
     
     let endpoint = ''
     if (props.actionType === 'liquidate') {
-      payload.type = liquidationType.value
-      if (liquidationType.value === 'MATURITY') {
-        payload.units = props.subscription.totalUnits
-      }
       endpoint = '/api/mutual-funds/liquidate-fund'
     } else {
       endpoint = '/api/mutual-funds/buy-additional-units'
@@ -265,14 +223,6 @@ const performAction = async () => {
 
 // Watch for changes
 watch(units, validateUnits)
-
-watch(() => liquidationType.value, (newType) => {
-  if (newType === 'MATURITY') {
-    units.value = props.subscription?.totalUnits || 0
-  } else {
-    units.value = ''
-  }
-})
 
 // Close modal on escape key
 onMounted(() => {

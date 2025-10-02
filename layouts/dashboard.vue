@@ -31,7 +31,7 @@
             >
               <i class="fas fa-chart-pie mr-3"></i>
               Mutual Funds
-            </NuxtLink>
+          </NuxtLink>
           <NuxtLink 
               to="/dashboard/my-subscriptions" 
               class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
@@ -39,7 +39,16 @@
             >
               <i class="fas fa-sync-alt mr-3"></i>
               My Subscriptions
-            </NuxtLink>
+          </NuxtLink>
+          <NuxtLink 
+            to="/dashboard/liquidate" 
+            class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+            :class="{ 'bg-[#ffa500]': route.path === '/dashboard/liquidate' }"
+            @click="isSidebarOpen = false"
+          >
+            <i class="fas fa-money-bill-wave mr-3"></i>
+            My Liquidations
+          </NuxtLink>
           <NuxtLink 
             to="/dashboard/loans" 
             class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
@@ -231,6 +240,15 @@
                   Mutual Funds
                 </NuxtLink>
                 <NuxtLink 
+                  to="/dashboard/liquidate" 
+                  class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
+                  :class="{ 'bg-[#ffa500]': route.path === '/dashboard/liquidate' }"
+                  @click="isSidebarOpen = false"
+                >
+                  <i class="fas fa-money-bill-wave mr-3"></i>
+                  My Liquidations
+                </NuxtLink>
+                <NuxtLink 
                   to="/dashboard/loans" 
                   class="flex items-center p-3 rounded-lg hover:bg-[#ffa500] transition-colors"
                   :class="{ 'bg-[#ffa500]': route.path === '/dashboard/loans' }"
@@ -321,6 +339,10 @@ const currentPageTitle = computed(() => {
       return 'Offers'
     case '/dashboard/mutual-funds':
       return 'Mutual Funds'
+    case '/dashboard/my-subscriptions':
+      return 'My Subscriptions'
+    case '/dashboard/liquidate':
+  return 'My Liquidations'
     case '/dashboard/loans':
       return 'Loans'
     case '/dashboard/equity-market':
@@ -344,6 +366,10 @@ const currentPageDescription = computed(() => {
       return 'Explore available investment opportunities'
     case '/dashboard/mutual-funds':
       return 'Explore and manage mutual fund investments'
+    case '/dashboard/my-subscriptions':
+      return 'Track your mutual fund investments and performance'
+    case '/dashboard/liquidate':
+  return 'Track your fund liquidation requests and their status'
     case '/dashboard/loans':
       return 'View and manage your loan products'
     case '/dashboard/equity-market':

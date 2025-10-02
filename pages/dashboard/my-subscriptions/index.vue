@@ -293,29 +293,67 @@ const openModal = (actionType, subscription) => {
   selectedSubscription.value = subscription
   showModal.value = true
 }
-
 const closeModal = () => {
   showModal.value = false
-  modalActionType.value = ''
-  selectedSubscription.value = null
+  // Small delay before clearing to prevent prop validation issues
+  setTimeout(() => {
+    modalActionType.value = ''
+    selectedSubscription.value = null
+  }, 100)
 }
 
 const handleActionSuccess = (data) => {
+  const actionType = modalActionType.value
+  
+  // Close modal first
+  closeModal()
+  
+  // For liquidation, show toast and navigate after delay
+  if (actionType === 'liquidate') {
+    showToast('Fund liquidation completed successfully!', 'success')
+    
+    // Navigate after showing toast (give user time to see the message)
+    setTimeout(() => {
+      navigateTo('/dashboard/liquidate')
+    }, 1500)
+    return
+  }
+  
+  // For buy action, show toast and refresh
+  showToast('Fund purchase completed successfully!', 'success')
+  if (data && selectedSubscription.value) {
+      const index = subscriptions.value.findIndex(sub => sub.id === selectedSubscription.value.id)
+      if (index !== -1) {
+        subscriptions.value[index] = { ...data }
+      }
+    }
+  // fetchSubscriptions()
+}
+
+const handleActionSuccessOld = (data) => {
   const actionName = modalActionType.value === 'liquidate' ? 'liquidation' : 'purchase'
   showToast(`Fund ${actionName} completed successfully!`, 'success')
   
   // Close modal first
   closeModal()
   
-  // Refresh subscriptions data
-  fetchSubscriptions()
+  // If liquidation, redirect to /liquidate page
+  if (modalActionType.value === 'liquidate') {
+    navigateTo('/dashboard/liquidate')
+    return
+  }
 
-//     if (data && selectedSubscription.value) {
-//     const index = subscriptions.value.findIndex(sub => sub.id === selectedSubscription.value.id)
-//     if (index !== -1) {
-//       subscriptions.value[index] = { ...data }
-//     }
-//   }
+  // For buy action, show toast and refresh
+  showToast(`Fund ${actionName} completed successfully!`, 'success')
+  // Refresh subscriptions data
+  // fetchSubscriptions()
+
+    if (data && selectedSubscription.value) {
+      const index = subscriptions.value.findIndex(sub => sub.id === selectedSubscription.value.id)
+      if (index !== -1) {
+        subscriptions.value[index] = { ...data }
+      }
+    }
 }
 
 const handleActionError = (error) => {
